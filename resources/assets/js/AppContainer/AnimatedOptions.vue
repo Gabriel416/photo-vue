@@ -15,6 +15,7 @@
                   </div>
                   <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" v-on:vdropzone-success-multiple="getFiles"></vue-dropzone>
                 </div>
+                <img src="/uploads/frame000.gif" alt="">
                 <div class="option-card text-center dropzone-card">
                   <div class="dropzone-content">
                     <p class="text-center gif-text">No Gif? No Problem.</p>
@@ -41,11 +42,10 @@
 </template>
 
 <script>
-
 //DROPZONE
 import vue2Dropzone from 'vue2-dropzone'
 import 'vue2-dropzone/dist/vue2Dropzone.css'
-import gifshot from 'gifshot';
+
 export default {
 
   components: {
@@ -91,49 +91,20 @@ export default {
 
   mounted() {
     console.log('Component mounted.');
-     // gifFrames({ url: "/uploads/5a63cb33e7f30.gif", frames: 'all' }).then(function (frameData) {
-     //    console.log(frameData, 'frame data');
-     //  });
   },
 
   methods: {
-
-    createInitialGif: function(frames) {
-        console.log(frames, 'frames');
-        var gifFrames = [];
-        for (var i = 0; i < frames.length; i++) {
-          gifFrames.push(i);
-        }
-        console.log(gifFrames, 'GIF ARRAY');
-        gifshot.createGIF({
-          'images': [...gifFrames]
-        },function(obj) {
-          console.log(obj, 'OBJ');
-          if(!obj.error) {
-            console.log('NO OBJ ERROR');
-            var image = obj.image,
-            animatedImage = document.createElement('img');
-            animatedImage.src = image;
-            document.body.appendChild(animatedImage);
-        }
-      });
-    },
 
     getFiles: function(file, response) {
       console.log(file, 'file');
       console.log(response, 'response');
       var frames = response.frames;
-      this.createInitialGif(frames);
+      this.$store.dispatch('setGif', frames);
+      //change component view here
+      this.$router.push({ path: 'preview' });
+      // this.createInitialGif(frames);
     },
   },
-
-  watch: {
-
-  },
-
-  computed: {
-    
-  }
 }
 
 </script>

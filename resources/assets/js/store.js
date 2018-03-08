@@ -6,7 +6,10 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-    gifFrames: []
+    gifFrames: [],
+    selectedFrames: [],
+    rangeMax: '',
+    domLoaded: false
   },
 
   getters: {
@@ -24,12 +27,8 @@ export const store = new Vuex.Store({
             animatedImage = document.createElement('img');
             animatedImage.src = image;
             animatedImage.className = "gif-preview";
-            document.getElementById("photo-preview").appendChild(animatedImage);
-
-            // Save data to sessionStorage
-			sessionStorage.setItem('addedToDom', true);
-
-            // document.body.appendChild(animatedImage);
+            document.getElementById("photo-preview").prepend(animatedImage);
+            store.commit('domLoaded', true);
         }
       });
     },
@@ -39,12 +38,24 @@ export const store = new Vuex.Store({
     setGif: (state, payload) => {
       //set our state here
       state.gifFrames = payload;
+        var frameArray = state.gifFrames;
+        var lastIndex = frameArray[frameArray.length - 1];
+        var rangeMax = frameArray.indexOf(lastIndex) + 1;
+        state.rangeMax = rangeMax;
+    },
+
+    domLoaded: (state, payload) => {
+      state.domLoaded = payload;
+    },
+
+    setSelectedFrames: (state, payload) => {
+      state.selectedFrames = payload;
     }
   },
 
   actions: {
     setGif: (context, payload) => {
-      //frames are our payload
+      //frames is our payload
       var gifFrames = [];
       for (var i = 0; i < payload.length; i++) {
         gifFrames.push('/' + payload[i]);
@@ -52,6 +63,20 @@ export const store = new Vuex.Store({
 
       //commit mutation
       context.commit('setGif', gifFrames);
+    },
+
+    updateGifPreview: (context, payload) => {
+      //selectedFrames is our payload
+      const newFrameArray = payload.map((selectedFrame) => {
+          return store.state.gifFrames[selectedFrame]
+      });
+
+      //commit mutation
+      context.commit('setSelectedFrames', newFrameArray)
     }
   }
 })
+
+
+
+
